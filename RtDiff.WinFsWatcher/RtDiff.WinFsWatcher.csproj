@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{770FA062-33F8-4260-BF90-46A86B1DF090}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{F2A4B899-2D6F-4705-9F36-960BB7BA57C9}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RtDiff.Console</RootNamespace>
-    <AssemblyName>RtDiff.Console</AssemblyName>
+    <RootNamespace>RtDiff.WinFsWatcher</RootNamespace>
+    <AssemblyName>RtDiff.WinFsWatcher</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,8 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleOutput.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="FileWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,17 +51,6 @@
       <Project>{5f8664c9-93ba-4162-8a17-786479b8c0ba}</Project>
       <Name>RtDiff.Tools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RtDiff.WinFsWatcher\RtDiff.WinFsWatcher.csproj">
-      <Project>{f2a4b899-2d6f-4705-9f36-960bb7ba57c9}</Project>
-      <Name>RtDiff.WinFsWatcher</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RtDiff.XmlDiffLogger\RtDiff.XmlDiffLogger.csproj">
-      <Project>{79995edc-283b-4ac6-badb-e1d935d99b66}</Project>
-      <Name>RtDiff.XmlDiffLogger</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
