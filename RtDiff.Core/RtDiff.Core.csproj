@@ -37,8 +37,9 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IDiffLogger.cs" />
-    <Compile Include="IOutput.cs" />
+    <Compile Include="IDiffWriter.cs" />
+    <Compile Include="IResourceComparer.cs" />
+    <Compile Include="IEventLogger.cs" />
     <Compile Include="IResourceWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RtDiffEventArgs.cs" />

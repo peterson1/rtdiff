@@ -17,7 +17,7 @@ public class FileWatcher : IResourceWatcher
 
 			_fsWatcher = new FileSystemWatcher(file.DirectoryName);
 			_fsWatcher.Filter = file.Name;
-			_fsWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			_fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.FileName;
 			_fsWatcher.IncludeSubdirectories = false;
 
 			_fsWatcher.Changed += File_Changed;
@@ -27,8 +27,6 @@ public class FileWatcher : IResourceWatcher
 
 	private void File_Changed(object sender, FileSystemEventArgs e)
 	{
-		if (e.ChangeType != WatcherChangeTypes.Changed) return;
-		
 		var lastWritten = File.GetLastWriteTime(e.FullPath);
 		if (lastWritten == _lastRead) return;
 		_lastRead = lastWritten;
@@ -48,6 +46,7 @@ public class FileWatcher : IResourceWatcher
 	}
 
 
+	//todo: centralize this
 	private bool IsFileReady(String sFilename)
 	{
 		// If the file can be opened for exclusive access it means that the file

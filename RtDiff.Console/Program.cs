@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using RtDiff.Core;
-using RtDiff.XmlDiffLogger;
+using RtDiff.XmlDiffPatchShim;
 
 namespace RtDiff.Console
 {
@@ -11,17 +11,22 @@ class Program
 	static void Main(string[] args)
 	{
 		var slaFile = args[0];
+		var diffFile = args[1];
 
 		Container = RegisterServices();
 		using (var scope = Container.BeginLifetimeScope())
 		{
 			var watchr = scope.Resolve<IResourceWatcher>();
-			var writr = scope.Resolve<IOutput>();
-			var loggr = scope.Resolve<IDiffLogger>
-				(new TypedParameter(typeof(IOutput), writr));
+			var logger = scope.Resolve<IEventLogger>();
+			var writer = scope.Resolve<IDiffWriter>();
+			
+			var comparer = scope.Resolve<IResourceComparer>
+				(new TypedParameter(typeof(IEventLogger), logger), 
+				 new TypedParameter(typeof(IDiffWriter), writer));
 
-			loggr.TakeSnapshot(slaFile);
-			watchr.FileChanged += loggr.HandleChange;
+			writer.OutputFile = diffFile;
+			comparer.TakeSnapshot(slaFile);
+			watchr.FileChanged += comparer.ResourceChanged;
 			watchr.StartWatching(slaFile);
 
 			System.Console.WriteLine("Press \'q\' to stop waiting for changes.");
@@ -36,8 +41,9 @@ class Program
 		var buildr = new ContainerBuilder();
 
 		buildr.RegisterType<WinFsWatcher.FileWatcher>().As<IResourceWatcher>();
-		buildr.RegisterType<ConsoleOutput>().As<IOutput>();
-		buildr.RegisterType<XmlDiffer>().As<IDiffLogger>();
+		buildr.RegisterType<EventLogger>().As<IEventLogger>();
+		buildr.RegisterType<XmlComparer>().As<IResourceComparer>();
+		buildr.RegisterType<DiffgramToHtml>().As<IDiffWriter>();
 		
 		return buildr.Build();
 	}
