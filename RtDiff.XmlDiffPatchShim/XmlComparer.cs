@@ -11,13 +11,15 @@ public class XmlComparer : IResourceComparer, IDisposable
 {
 	private IEventLogger _log;
 	private IDiffWriter _writer;
+	private IDiffgramFormatter _formatter;
 	private string _snapshot;
 
 
-	public XmlComparer(IEventLogger logger, IDiffWriter writer)
+	public XmlComparer(IEventLogger logger, IDiffWriter writer, IDiffgramFormatter formatter)
 	{
 		_log = logger;
 		_writer = writer;
+		_formatter = formatter;
 	}
 
 
@@ -52,8 +54,13 @@ public class XmlComparer : IResourceComparer, IDisposable
 				_log.Write(args.FileName + " is unchanged.");
 			else
 			{
-				_writer.Write(sw.ToString(), _snapshot);
-				_log.Write("Changes written to: " + _writer.OutputFile);
+				var diffgram = sw.ToString();
+				
+				_writer.Write(diffgram, _snapshot);
+				//_log.Write("Changes written to: " + _writer.OutputFile);
+				
+				_log.Write(_formatter.Summarize(diffgram, 
+							File.ReadAllText(_snapshot)));
 			}
 
 		}

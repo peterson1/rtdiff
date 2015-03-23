@@ -26,6 +26,7 @@ public class DiffgramToHtml : IDiffWriter
 		using (var writr = new StreamWriter(_outputFile))
 		{
 			StartHtmlTableTag(writr);
+			WriteLegend(writr);
 
 			using (var origXml = new XmlTextReader(snapshotOfResource))
 			{
@@ -33,10 +34,14 @@ public class DiffgramToHtml : IDiffWriter
 				diffView.GetHtml(writr); 
 			}
 
+			WriteLegend(writr);
 			EndHtmlTableTag(writr);
 		}
 
 		ReplaceInlineStyles();
+
+		//todo: delete this after debugging
+		File.WriteAllText(Path.ChangeExtension(_outputFile, ".xml"), diffgramText);
 	}
 
 	private void ReplaceInlineStyles()
@@ -93,28 +98,31 @@ public class DiffgramToHtml : IDiffWriter
 
 	private static void EndHtmlTableTag(StreamWriter writr)
 	{
-		writr.Write("<tr><td><b>Legend:</b>" 
-			+ FontTag.Legend(ChangeType.Added)
-			+ "&nbsp;&nbsp;" 
-			
-			+ FontTag.Legend(ChangeType.Removed)
-			+ "&nbsp;&nbsp;" 
-			
-			+ FontTag.Legend(ChangeType.Changed)
-			+ "&nbsp;&nbsp;" 
-			
-			+ FontTag.Legend(ChangeType.MovedFrom)
-			+ "&nbsp;&nbsp;" 
-			
-			+ FontTag.Legend(ChangeType.MovedTo)
-			+ "&nbsp;&nbsp;" 
-			
-			+ FontTag.Legend(ChangeType.Ignored)
-			+ "&nbsp;&nbsp;" 
-			
-			+ "</td></tr>");
-
 		writr.Write("</table></body></html>");
+	}
+
+	private static void WriteLegend(StreamWriter writr)
+	{
+		writr.Write("<tr><td><b>Legend:</b>"
+			+ FontTag.Legend(ChangeType.Added)
+			+ "&nbsp;&nbsp;"
+
+			+ FontTag.Legend(ChangeType.Removed)
+			+ "&nbsp;&nbsp;"
+
+			+ FontTag.Legend(ChangeType.Changed)
+			+ "&nbsp;&nbsp;"
+
+			+ FontTag.Legend(ChangeType.MovedFrom)
+			+ "&nbsp;&nbsp;"
+
+			+ FontTag.Legend(ChangeType.MovedTo)
+			+ "&nbsp;&nbsp;"
+
+			+ FontTag.Legend(ChangeType.Ignored)
+			+ "&nbsp;&nbsp;"
+
+			+ "</td></tr>");
 	}
 
 

@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RtDiff.Console</RootNamespace>
     <AssemblyName>RtDiff.Console</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac">
@@ -44,14 +47,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C_nsole.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\Assembly.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RtDiff.Core\RtDiff.Core.csproj">
       <Project>{21be7dbc-051c-4819-96ce-50c4023b66b3}</Project>
       <Name>RtDiff.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RtDiff.ReadableDiffgram\RtDiff.ReadableDiffgram.csproj">
+      <Project>{1ae89d6e-8367-415d-9fc4-ba0d8e54d1e1}</Project>
+      <Name>RtDiff.ReadableDiffgram</Name>
     </ProjectReference>
     <ProjectReference Include="..\RtDiff.Tools\RtDiff.Tools.csproj">
       <Project>{5f8664c9-93ba-4162-8a17-786479b8c0ba}</Project>
@@ -67,6 +76,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace RtDiff.Tools
@@ -83,6 +84,10 @@ public static class StringExtensions
 	}
 
 
+	public static int ToInt(this string text)
+	{ return int.Parse(text); }
+
+
 	public static string Repeat(this string text, int count)
 	{  return string.Concat(Enumerable.Repeat(text, count));  }
 
@@ -95,11 +100,55 @@ public static class StringExtensions
 
 
 
-
-	public static string Truncate(this string value, int maxLength)
+	public static string XmlValue(this string xmlFragment)
 	{
-		if (string.IsNullOrEmpty(value)) return value;
-		return value.Substring(0, Math.Min(value.Length, maxLength));
+		var sansOpenTag = xmlFragment.TextAfter(">");
+		return sansOpenTag.TextBefore("<");
+	}
+
+	public static string XmlAttributes(this string xmlFragment)
+	{
+		var sansOpenTag = xmlFragment.Trim().TextAfter(" ");
+		return sansOpenTag.TextBefore(">");
+	}
+
+
+
+	public static string TextUpTo(this string text, string findThis)
+	{
+		var pos = text.IndexOf(findThis);
+		if (pos == -1) return text;
+
+		return text.Substring(0, pos + findThis.Length);
+	}
+
+	public static string TextBefore(this string text, string findThis)
+	{
+		var pos = text.IndexOf(findThis);
+		if (pos == -1) return text;
+
+		return text.Substring(0, pos);
+	}
+
+	public static string TextAfter(this string text, string findThis)
+	{
+		var pos = text.IndexOf(findThis);
+		if (pos == -1) return text;
+
+		return text.Substring(pos + findThis.Length);
+	}
+
+
+
+	public static string Truncate(this string value, int maxLength, string truncatedMark = null)
+	{
+		if (string.IsNullOrEmpty(value)) return value;		
+		if (value.Length <= maxLength) return value;
+
+		if (truncatedMark == null)
+			return value.Substring(0, maxLength);
+		else
+			return value.Substring(0, maxLength - truncatedMark.Length) + truncatedMark;
 	}
 
 
@@ -113,5 +162,26 @@ public static class StringExtensions
 	}
 
 
+
+	public static List<string> SplitByLine(this string multiLineText)
+	{
+		var list = new List<string>();
+
+		using (StringReader sr = new StringReader(multiLineText)) {
+			string line;
+			while ((line = sr.ReadLine()) != null) {
+				list.Add(line);
+			}
+		}
+
+		return list;
+	}
+
 }
+
+public class Line
+{
+	public static string Break { get { return Environment.NewLine; } }
+}
+
 }

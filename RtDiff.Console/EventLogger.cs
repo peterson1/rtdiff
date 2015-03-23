@@ -6,7 +6,7 @@ class EventLogger : IEventLogger
 {
 	public void Write(string eventDescription)
 	{
-		System.Console.WriteLine(eventDescription);
+		C_nsole.Write(eventDescription);
 	}
 }
 }

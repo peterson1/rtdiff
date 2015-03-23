@@ -19,18 +19,19 @@ class Program
 			var watchr = scope.Resolve<IResourceWatcher>();
 			var logger = scope.Resolve<IEventLogger>();
 			var writer = scope.Resolve<IDiffWriter>();
+			var formtr = scope.Resolve<IDiffgramFormatter>();
 			
 			var comparer = scope.Resolve<IResourceComparer>
 				(new TypedParameter(typeof(IEventLogger), logger), 
-				 new TypedParameter(typeof(IDiffWriter), writer));
+				 new TypedParameter(typeof(IDiffWriter), writer),
+				 new TypedParameter(typeof(IDiffgramFormatter), formtr));
 
 			writer.OutputFile = diffFile;
 			comparer.TakeSnapshot(slaFile);
 			watchr.FileChanged += comparer.ResourceChanged;
 			watchr.StartWatching(slaFile);
 
-			System.Console.WriteLine("Press \'q\' to stop waiting for changes.");
-			while(System.Console.Read()!='q');
+			C_nsole.WaitForKey('q', "Press \'q\' to stop waiting for changes.");
 		}
 	}
 
@@ -44,6 +45,7 @@ class Program
 		buildr.RegisterType<EventLogger>().As<IEventLogger>();
 		buildr.RegisterType<XmlComparer>().As<IResourceComparer>();
 		buildr.RegisterType<DiffgramToHtml>().As<IDiffWriter>();
+		buildr.RegisterType<ReadableDiffgram.Formatter>().As<IDiffgramFormatter>();
 		
 		return buildr.Build();
 	}
