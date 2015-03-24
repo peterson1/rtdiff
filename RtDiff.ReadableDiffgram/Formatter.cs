@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using RtDiff.Core;
@@ -9,7 +9,6 @@ namespace RtDiff.ReadableDiffgram
 {
 public class Formatter : IDiffgramFormatter
 {
-	const int MAXLENGTH = 79;
 	const string XD_NODE = "xd:node";
 	const string XD_ADD = "xd:add";
 	const string XD_REMOVE = "xd:remove";
@@ -18,16 +17,17 @@ public class Formatter : IDiffgramFormatter
 
 	private XNamespace _xd = "http://schemas.microsoft.com/xmltools/2002/xmldiff";
 
-	public string Summarize(string diffgramText, string origXmlText)
+
+	public string Summarize(string diffgramText, string oldXmlText, string newXmlText, int maxLength)
 	{
-		var lines = SwapNodeNames(diffgramText, origXmlText);
+		var lines = SwapNodeNames(diffgramText, oldXmlText, newXmlText);
 		
 		lines = lines.GetRange(2, lines.Count - 3);
-		lines = lines.Select(x => x.Truncate(MAXLENGTH, " (...)")).ToList();
+		lines = lines.Select(x => x.Truncate(maxLength, " (...)")).ToList();
 
 		lines = SwapAddTag(lines);
 		lines = SwapRemoveTag(lines);
-		lines = SwapChangeTag(lines);
+		//lines = SwapChangeTag(lines);
 
 		return Line.Break.Repeat(3)
 			+ string.Join(Line.Break, lines);
@@ -35,7 +35,7 @@ public class Formatter : IDiffgramFormatter
 
 
 
-	private List<string> SwapNodeNames(string diffgramText, string origXmlText)
+	private List<string> SwapNodeNames(string diffgramText, string oldXmlText, string newXmlText)
 	{
 		var retLines = new List<string>();
 		var difLines = diffgramText.SplitByLine();
@@ -43,32 +43,72 @@ public class Formatter : IDiffgramFormatter
 		var diff = XElement.Parse(diffgramText);
 		var xdNode = diff.Element(_xd + "node");
 
-		var origNode = XElement.Parse(origXmlText);
+		var oldXml = XElement.Parse(oldXmlText);
+		var newXml = XElement.Parse(newXmlText);
 		var tagStack = new Stack<string>();
 
 		foreach (var line in difLines)
 		{
 			if (line.Contains("<" + XD_NODE))
-			{
-				retLines.Add(line.TextBefore("<") + origNode.ToString().TextUpTo(">"));
-				tagStack.Push(origNode.Name.LocalName);
-				MatchNextNode(ref xdNode, ref origNode);
-			}
+				SwapXdNode(retLines, ref xdNode, ref oldXml, ref newXml, tagStack, line);
+			
 			else if (line.Contains("</" + XD_NODE + ">"))
-			{
 				retLines.Add(line.TextBefore("<") + "</" + tagStack.Pop() + ">");
-			}
-			else
+			
+			else if (line.Contains(XD_CHANGE))
 			{
-				retLines.Add(line);
+				retLines.Add("");
+
+				var indnt = line.TextBefore("<");
+				var xdlPath = line.Between("\"", "\"", true);
+				var newVal = line.XmlValue();
+				var oldElm = TraceElement(oldXmlText, tagStack);
+				var oldVal = GetXdlValue(oldElm, xdlPath);
+
+				retLines.Add("{0}:  Changed value of tag for XDL path : {1}".f(indnt, xdlPath));
+				retLines.Add("{0}     old value = '{1}'".f(indnt, oldVal));
+				retLines.Add("{0}     new value = '{1}'".f(indnt, newVal));
+
+				retLines.Add("");
 			}
+			
+			else
+				retLines.Add(line);
 		}
 
 		return retLines;
 	}
 
+	private string GetXdlValue(XElement elm, string xdlPath)
+	{
+		if (!xdlPath.StartsWith("@"))
+			throw new NotImplementedException();
 
-	private void MatchNextNode(ref XElement xdNode, ref XElement origNode)
+		return elm.Attribute(xdlPath.TextAfter("@")).Value;
+	}
+
+
+
+	private XElement TraceElement(string xmlText, Stack<string> tagStack)
+	{
+		var elm = XElement.Parse(xmlText);
+		for (int i = tagStack.Count - 2; i >= 0; i--)
+		{
+			elm = elm.Element(tagStack.ElementAt(i));
+		}
+		return elm;
+	}
+
+
+	private void SwapXdNode(List<string> retLines, ref XElement xdNode, ref XElement oldXml, ref XElement newXml, Stack<string> tagStack, string line)
+	{
+		retLines.Add(line.TextBefore("<") + oldXml.ToString().TextUpTo(">"));
+		tagStack.Push(oldXml.Name.LocalName);
+		MatchNextNode(ref xdNode, ref oldXml, ref newXml);
+	}
+
+
+	private void MatchNextNode(ref XElement xdNode, ref XElement oldXml, ref XElement newXml)
 	{
 		var nextXdNode = xdNode.Descendants(_xd + "node").FirstOrDefault();
 		if (nextXdNode == null)
@@ -81,16 +121,18 @@ public class Formatter : IDiffgramFormatter
 		xdNode = nextXdNode;
 		if (xdNode == null)
 		{
-			origNode = null;
+			oldXml = null;
+			newXml = null;
 			return;
 		}
 
 		var indx = xdNode.Attribute(ATT_MATCH).Value.ToInt();
-		origNode = origNode.Elements().ElementAt(indx - 1);
+		oldXml = oldXml.Elements().ElementAt(indx - 1);
+		//newXml = newXml.Elements().ElementAt(indx - 1);
 	}
 
 
-	private List<string> SwapChangeTag(List<string> lines)
+	/*private List<string> SwapChangeTag(List<string> lines)
 	{
 		var newList = new List<string>();
 
@@ -114,7 +156,7 @@ public class Formatter : IDiffgramFormatter
 		}
 
 		return newList;
-	}
+	}*/
 
 
 	private List<string> SwapRemoveTag(List<string> lines)

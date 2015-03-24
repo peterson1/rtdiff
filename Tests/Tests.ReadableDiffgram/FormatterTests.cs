@@ -1,5 +1,5 @@
-﻿using Xunit;
-using RtDiff.ReadableDiffgram;
+﻿using RtDiff.ReadableDiffgram;
+using Xunit;
 
 namespace Tests.ReadableDiffgram
 {
@@ -11,7 +11,7 @@ public class FormatterTests
 	public void Summarize(string diff, string orig, string summary)
 	{
 		var sut = new Formatter();
-		var actual = sut.Summarize(diff, orig);
+		var actual = sut.Summarize(diff, orig, "", 208);
 		Assert.Equal(summary, actual);
 	}
 }

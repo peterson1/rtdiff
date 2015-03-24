@@ -16,7 +16,7 @@ public static class StringExtensions
 		if (pos1 == -1) return fullText;
 
 		int pos2 = seekLastStringFromEnd ? 
-			fullText.LastIndexOf(lastString) + 1
+			fullText.LastIndexOf(lastString)
 			: fullText.IndexOf(lastString);
 		if (pos2 == -1 || pos2 <= pos1) return fullText;
 			

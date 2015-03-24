@@ -8,5 +8,11 @@ class EventLogger : IEventLogger
 	{
 		C_nsole.Write(eventDescription);
 	}
+
+
+	public int MaxLength
+	{
+		get { return System.Console.WindowWidth - 1; }
+	}
 }
 }

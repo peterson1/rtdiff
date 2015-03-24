@@ -58,9 +58,13 @@ public class XmlComparer : IResourceComparer, IDisposable
 				
 				_writer.Write(diffgram, _snapshot);
 				//_log.Write("Changes written to: " + _writer.OutputFile);
-				
-				_log.Write(_formatter.Summarize(diffgram, 
-							File.ReadAllText(_snapshot)));
+
+				var summary = _formatter.Summarize(diffgram,
+									File.ReadAllText(_snapshot),
+									File.ReadAllText(currentFile),
+									_log.MaxLength);
+
+				_log.Write(summary);
 			}
 
 		}
